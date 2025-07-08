@@ -157,6 +157,13 @@
     }
   });
 </script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/Expense-Tracker/service-worker.js', { scope: '/Expense-Tracker/' })
+      .then(() => console.log('✅ Service Worker registered'))
+      .catch(err => console.error('❌ Service Worker failed:', err));
+  }
+</script>
 
 </body>
 
