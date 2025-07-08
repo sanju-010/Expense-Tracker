@@ -208,6 +208,8 @@ h1 {
     cursor: pointer;
     z-index: 999;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    width: 56px;
+    height: 56px;
 }
 
 #sidebar {
@@ -367,6 +369,7 @@ body.dark #category-list li {
 body.dark #category-list button {
     color: #ff7675;
 }
+
 body.dark .summary,
 body.dark .filter-section,
 body.dark .category-manager,
@@ -374,6 +377,7 @@ body.dark #chart,
 body.dark #barChart {
     background: #434343;
 }
+
 /* Responsive */
 @media (max-width: 500px) {
 
