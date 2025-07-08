@@ -5,11 +5,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Expense Tracker</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="/Expense-Tracker/style.css" />
+  <link rel="manifest" href="/Expense-Tracker/manifest.json">
     <meta name="theme-color" content="#00b894" />
-    <script src="chart.min.js"></script>
-    <script defer src="app.js"></script>
+  <script src="/Expense-Tracker/chart.min.js"></script>
+  <script defer src="/Expense-Tracker/app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 
@@ -122,13 +122,14 @@
     <!-- Overlay -->
     <div id="overlay" onclick="toggleMenu()"></div>
 
-    
+
+<!-- Install button and other scripts -->
 <button id="installBtn" style="display: none;">📲 Install App</button>
 
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('service-worker.js', { scope: './' })
+      navigator.serviceWorker.register('/Expense-Tracker/service-worker.js', { scope: '/Expense-Tracker/' })
         .then(() => console.log('✅ Service Worker registered'))
         .catch(err => console.error('❌ Service Worker failed:', err));
     });
@@ -145,18 +146,20 @@
   document.getElementById("installBtn").addEventListener("click", () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(choiceResult => {
-        if (choiceResult.outcome === 'accepted') {
+      deferredPrompt.userChoice.then(choice => {
+        if (choice.outcome === 'accepted') {
           console.log('✅ User accepted install');
         } else {
           console.log('❌ User dismissed install');
         }
         deferredPrompt = null;
-        document.getElementById("installBtn").style.display = "none";
       });
     }
   });
 </script>
+
+</body>
+
 
 
 

@@ -1,6 +1,6 @@
 const CACHE_NAME = 'expense-tracker-v1';
 const urlsToCache = [
-  '/Expense-Tracker/',
+  '/Expense-Tracker/',                // <-- this must match
   '/Expense-Tracker/index.html',
   '/Expense-Tracker/style.css',
   '/Expense-Tracker/app.js',
@@ -8,7 +8,6 @@ const urlsToCache = [
   '/Expense-Tracker/icon-192.png',
   '/Expense-Tracker/icon-512.png'
 ];
-;
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
