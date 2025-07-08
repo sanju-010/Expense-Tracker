@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#00b894" />
+    <script src="chart.min.js"></script>
+    <script defer src="app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="loading-message" style="text-align: center; margin-top: 20px;">Loading app...</div>
+
+    <div class="container">
+        <h1>My Expense Tracker</h1>
+
+        <div class="input-group">
+            <!-- <input type="text" id="name" placeholder="Name" /> -->
+            <!-- Name Input with live suggestions -->
+            <div class="dropdown-wrapper">
+                <input type="text" id="name" placeholder="Name" autocomplete="off" oninput="showNameSuggestions()" />
+                <div id="name-suggestions" class="dropdown-list"></div>
+            </div>
+            <input type="number" id="amount" placeholder="Amount" />
+            <select id="type">
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
+            <!-- <input list="categoryList" id="category" placeholder="Category" /> -->
+            <!-- <datalist id="categoryList"></datalist> -->
+            <div class="dropdown-wrapper">
+                <input type="text" id="category" placeholder="Category" autocomplete="off"
+                    oninput="showCategorySuggestions()" />
+                <div id="category-suggestions" class="dropdown-list"></div>
+            </div>
+            <input type="date" id="date" />
+            <button onclick="addEntry()">Add</button>
+        </div>
+
+        <div class="summary">
+            <p><strong>This Period:</strong></p>
+            <p>Income: ₹<span id="income">0</span></p>
+            <p>Expense: ₹<span id="expense">0</span></p>
+            <p>Balance: ₹<span id="balance">0</span></p>
+        </div>
+
+        <div class="filter-section">
+            <label for="filter">Show:</label>
+            <select id="filter" onchange="onFilterChange()">
+                <option value="this-month">This Month</option>
+                <option value="last-3-months">Last 3 Months</option>
+                <option value="last-6-months">Last 6 Months</option>
+                <option value="last-12-months">Last 12 Months</option>
+                <option value="by-year">By Year</option>
+                <option value="by-month-year">By Month & Year</option>
+            </select>
+
+            <select id="year-select" onchange="updateUI()" style="display:none;"></select>
+
+            <select id="month-year-select" onchange="updateUI()" style="display:none;"></select>
+        </div>
+        <div id="no-data-msg" style="display:none; text-align:center; font-weight: bold; color: gray; margin: 20px 0;">
+            🚫 No entries available for the selected filter.
+        </div>
+        <!-- <input type="text" id="search" placeholder="Search by name or category..." oninput="updateUI()" style="width: 100%; margin-top: 10px; padding: 10px; border-radius: 8px; border: 1px solid #ccc;" /> -->
+        <div id="search-drp" class="dropdown-wrapper" style="position: relative;">
+            <input type="text" id="search" placeholder="Search by name or category..." autocomplete="off"
+                oninput="showSearchSuggestions()"
+                style="width: 100%; margin-top: 10px; margin-bottom: 10px; padding: 10px; border-radius: 8px; border: 1px solid #ccc;" />
+            <div id="search-suggestions" class="dropdown-list"></div>
+            <button id="clear-search-btn" onclick="clearSearch()" style="
+            position: absolute;
+            right: 10px;
+            top: 48%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            display: none;
+            color: red;
+            ">✖</button>
+        </div>
+
+
+        <canvas id="chart"></canvas>
+
+        <h3 id="entry-list-title">Entries</h3>
+        <ul id="entry-list"></ul>
+        <canvas id="barChart" style="margin-top: 20px;"></canvas>
+
+        <div class="category-manager">
+            <h3>Your Categories</h3>
+            <ul id="category-list"></ul>
+        </div>
+    </div>
+    <!-- <div class="extra-options" style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+  <button onclick="exportData()">📤 Export Entries</button>
+  <input type="file" id="importFile" onchange="importData(event)" accept=".json" />
+  <button onclick="toggleTheme()">🌓 Toggle Dark Mode</button>
+</div> -->
+    <!-- <button onclick="console.log('Entries:', entries)">Debug: Show Entries</button> -->
+
+
+
+    <!-- Hamburger Button -->
+    <button id="menu-btn" onclick="toggleMenu()">☰</button>
+
+    <!-- Sidebar Drawer -->
+    <div id="sidebar">
+        <h3>Menu</h3>
+        <button onclick="toggleTheme()">🌓 Toggle Dark Mode</button>
+        <button onclick="exportData()">📤 Export Entries</button>
+        <input type="file" id="importFile" onchange="importData(event)" accept=".json" />
+    </div>
+
+    <!-- Overlay -->
+    <div id="overlay" onclick="toggleMenu()"></div>
+
+    
+<button id="installBtn" style="display: none;">📲 Install App</button>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js', { scope: './' })
+        .then(() => console.log('✅ Service Worker registered'))
+        .catch(err => console.error('❌ Service Worker failed:', err));
+    });
+  }
+
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('📦 beforeinstallprompt event fired');
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById("installBtn").style.display = "block";
+  });
+
+  document.getElementById("installBtn").addEventListener("click", () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(choiceResult => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('✅ User accepted install');
+        } else {
+          console.log('❌ User dismissed install');
+        }
+        deferredPrompt = null;
+        document.getElementById("installBtn").style.display = "none";
+      });
+    }
+  });
+</script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,400 @@
+/* --- CLEANED style.css --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f1f3f6;
+    color: #2d3436;
+}
+
+.container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #00b894;
+    margin-bottom: 20px;
+    padding-top: 34px;
+}
+
+/* Input Group */
+.input-group {
+    background: #fff;
+    padding: 15px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.input-group input,
+.input-group select {
+    flex: 1 1 48%;
+    padding: 10px;
+    border: 1px solid #dfe6e9;
+    border-radius: 10px;
+    font-size: 14px;
+    background: #fdfefe;
+    width: 100%;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    border-color: #00b894;
+    outline: none;
+}
+
+.input-group button {
+    flex: 1 1 100%;
+    padding: 12px;
+    background: #00b894;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-top: 12px;
+}
+
+.input-group button:hover {
+    background: #019870;
+}
+
+/* Summary */
+.summary,
+.filter-section,
+.category-manager,
+#chart,
+#barChart {
+    background: #fff;
+    padding: 15px;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+    margin-bottom: 20px;
+}
+
+.filter-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.filter-section select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    flex: 1;
+    width: 100px;
+}
+
+/* Entry List */
+#entry-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.entry-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    background-color: #f9f9f9;
+    font-size: 14px;
+}
+
+.entry-card.income {
+    background-color: #9ff19f;
+}
+
+.entry-card.expense {
+    background-color: #ff7272;
+}
+
+.entry-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.entry-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #373737;
+}
+
+.entry-details {
+    font-size: 12px;
+    color: #555;
+}
+
+.entry-amount {
+    font-weight: 600;
+    font-size: 16px;
+    color: #373737;
+}
+
+.entry-delete {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    margin-left: 8px;
+    color: #000;
+    transition: transform 0.2s;
+}
+
+.entry-delete:hover {
+    transform: scale(1.2);
+}
+
+/* Category List */
+#category-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+}
+
+#category-list li {
+    background: #dfe6e9;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+#category-list button {
+    background: transparent;
+    border: none;
+    color: #d63031;
+    font-size: 16px;
+    margin-left: 6px;
+    cursor: pointer;
+}
+
+/* Hamburger & Sidebar */
+#menu-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-size: 24px;
+    background: #00b894;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 240px;
+    height: 100%;
+    background: white;
+    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#sidebar h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #00b894;
+}
+
+#sidebar button {
+    background: #00b894;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#sidebar input[type="file"] {
+    background: #dfe6e9;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 14px;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 999;
+    transition: opacity 0.3s ease;
+}
+
+.menu-open #sidebar {
+    left: 0;
+}
+
+.menu-open #overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ********** */
+.dropdown-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 100;
+    border-radius: 8px;
+    display: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-list div {
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.dropdown-list div:hover {
+    background-color: #f1f1f1;
+}
+
+body.dark .dropdown-list {
+    background: #2e2e2e;
+    border-color: #555;
+}
+
+body.dark .dropdown-list div:hover {
+    background: #444;
+}
+
+
+/* Dark Mode */
+body.dark {
+    background: #1e1e1e;
+    color: #eee;
+}
+
+body.dark .container,
+body.dark .input-group,
+body.dark .summary,
+body.dark .filter-section,
+body.dark .category-manager,
+body.dark #entry-list li,
+body.dark #chart,
+body.dark #barChart {
+    background: #2e2e2e;
+    color: #fff;
+}
+
+body.dark .entry-card.income {
+    background-color: #9ff19f !important;
+}
+
+body.dark .entry-card.expense {
+    background-color: #ff7272 !important;
+}
+
+body.dark input,
+body.dark select {
+    background: #444;
+    color: #fff;
+    border-color: #666;
+    width: 100%;
+}
+
+body.dark #sidebar {
+    background: #2e2e2e;
+}
+
+body.dark #sidebar button {
+    background: #019870;
+}
+
+body.dark canvas {
+    background-color: #2e2e2e !important;
+}
+
+body.dark #category-list li {
+    background: #3a3a3a;
+    color: #eee;
+    border: 1px solid #555;
+}
+
+body.dark #category-list button {
+    color: #ff7675;
+}
+body.dark .summary,
+body.dark .filter-section,
+body.dark .category-manager,
+body.dark #chart,
+body.dark #barChart {
+    background: #434343;
+}
+/* Responsive */
+@media (max-width: 500px) {
+
+    .input-group input,
+    .input-group select {
+        flex: 1 1 100%;
+    }
+
+    .input-group {
+        gap: 10px;
+    }
+
+    #entry-list li {
+        flex-direction: row;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        font-size: 12px;
+    }
+
+    #entry-list li>* {
+        flex: 1 1 auto;
+        margin: 2px 4px;
+    }
+}
