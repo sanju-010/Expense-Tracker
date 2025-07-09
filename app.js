@@ -240,6 +240,7 @@ function addEntry() {
   document.getElementById("name").value = "";
   document.getElementById("amount").value = "";
   document.getElementById("category").value = "";
+  document.getElementById("description").value = "";
   document.getElementById("type").value = "income";
   document.getElementById("date").valueAsDate = new Date();
 
