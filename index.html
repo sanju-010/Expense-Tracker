@@ -61,12 +61,56 @@
       <input type="date" id="date" />
       <button onclick="addEntry()">Add</button>
     </div>
+    <div class="summary" id="upcoming-section">
+      <p><strong>Upcoming Payments</strong></p>
+      <ul id="upcoming-list" class="upcoming-list"></ul>
+      <!-- Show more/less control -->
+      <div class="upcoming-controls">
+        <button id="toggle-upcoming-btn" onclick="toggleUpcoming()">Show more</button>
+      </div>
+      <!-- Add Upcoming Button -->
+      <div class="upcoming-btn">
+        <button onclick="openUpcomingForm()" class="add-upcoming-btn">✚ Add Upcoming</button>
+      </div>
+    </div>
+    <!-- Upcoming Popup -->
+    <div id="upcoming-popup" class="popup-overlay" onclick="closeUpcomingPopup(event)">
+      <div class="popup-content" onclick="event.stopPropagation();">
+        <span id="popup-close" onclick="closeUpcomingPopup(event)">×</span>
+        <h3>Add Upcoming Payment</h3>
+
+        <input type="text" id="up-name" placeholder="Payment Name" />
+        <textarea id="up-description" placeholder="Description (optional)"></textarea>
+        <input type="number" id="up-amount" placeholder="Amount" />
+        <input type="date" id="up-date" />
+
+        <button onclick="submitUpcoming()">Add</button>
+      </div>
+    </div>
+    <!-- Upcoming Payment Details Popup -->
+    <div id="upcoming-popup-view" class="popup-overlay" onclick="closeUpcomingViewPopup(event)">
+      <div class="popup-content" onclick="event.stopPropagation();">
+        <div class="close-wrap">
+          <span onclick="closeUpcomingViewPopup(event)">×</span>
+        </div>
+        <h3>Upcoming Payment Details</h3>
+        <p><strong>Name:</strong> <span id="up-popup-name"></span></p>
+        <p><strong>Amount:</strong> <span id="up-popup-amount"></span></p>
+        <p><strong>Due Date:</strong> <span id="up-popup-date"></span></p>
+        <p><strong>Description:</strong> <span id="up-popup-description"></span></p>
+
+        <!-- 🗑 Delete Button Inside Popup -->
+        <button id="popup-delete-btn2">🗑 Delete</button>
+      </div>
+    </div>
+
+
 
     <div class="summary">
       <p><strong>This Period:</strong></p>
-      <p>Income: ₹<span id="income">0</span></p>
-      <p>Expense: ₹<span id="expense">0</span></p>
-      <p>Balance: ₹<span id="balance">0</span></p>
+      <p>Income: <span class="green">₹</span><span class="green" id="income">0</span></p>
+      <p>Expense: <span id="expense">0</span></p>
+      <p>Balance: <span class="">₹</span><span id="balance">0</span></p>
     </div>
 
     <div class="filter-section">
@@ -112,6 +156,10 @@
 
     <h3 id="entry-list-title">Entries</h3>
     <ul id="entry-list"></ul>
+    <!-- Show more/less control -->
+    <div class="entries-controls">
+      <button id="toggle-entries-btn" onclick="toggleentries()">Show more</button>
+    </div>
     <canvas id="barChart" style="margin-top: 20px;"></canvas>
 
     <div class="category-manager">
@@ -143,19 +191,19 @@
   <div id="overlay" onclick="toggleMenu()"></div>
 
 
-<!-- Entry Details Popup -->
-<div id="entry-popup" class="popup-overlay" onclick="closePopup(event)">
-  <div class="popup-content" onclick="event.stopPropagation();">
-    <span id="popup-close" onclick="closePopup(event)">×</span>
-    <h3>Entry Details</h3>
-    <p><strong>Name:</strong> <span id="popup-name"></span></p>
-    <p><strong>Category:</strong> <span id="popup-category"></span></p>
-    <p><strong>Amount:</strong> <span id="popup-amount"></span></p>
-    <p><strong>Date:</strong> <span id="popup-date"></span></p>
-    <p><strong>Description:</strong> <span id="popup-description"></span></p>
-    <button id="popup-delete-btn">🗑 Delete</button>
+  <!-- Entry Details Popup -->
+  <div id="entry-popup" class="popup-overlay" onclick="closePopup(event)">
+    <div class="popup-content" onclick="event.stopPropagation();">
+      <span id="popup-close" onclick="closePopup(event)">×</span>
+      <h3>Entry Details</h3>
+      <p><strong>Name:</strong> <span id="popup-name"></span></p>
+      <p><strong>Category:</strong> <span id="popup-category"></span></p>
+      <p><strong>Amount:</strong> <span id="popup-amount"></span></p>
+      <p><strong>Date:</strong> <span id="popup-date"></span></p>
+      <p><strong>Description:</strong> <span id="popup-description"></span></p>
+      <button id="popup-delete-btn">🗑 Delete</button>
+    </div>
   </div>
-</div>
 
 
 

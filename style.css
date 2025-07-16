@@ -47,9 +47,11 @@ h1 {
     font-size: 14px;
     background: #fdfefe;
     width: 100%;
+    outline: none;
 }
 
 .input-group input:focus,
+.input-group textarea:focus,
 .input-group select:focus {
     border-color: #00b894;
     outline: none;
@@ -83,10 +85,11 @@ h1 {
     font-family: 'Poppins', sans-serif;
     resize: vertical;
     min-height: 60px;
+    outline: none;
 }
 
 .input-group textarea:focus {
-    border-color: #00b894;
+    border-color: #00b894 !important;
     outline: none;
 }
 
@@ -116,6 +119,7 @@ h1 {
     border-radius: 8px;
     flex: 1;
     width: 100px;
+    outline: none;
 }
 
 /* Entry List */
@@ -267,6 +271,7 @@ h1 {
     border-radius: 8px;
     padding: 8px;
     font-size: 14px;
+    outline: none;
 }
 
 #overlay {
@@ -325,44 +330,233 @@ h1 {
 
 /* Entry list popup */
 .popup-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
 .popup-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 400px;
-  position: relative;
-  font-family: 'Poppins', sans-serif;
+    background: #fff;
+    padding: 20px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    font-family: 'Poppins', sans-serif;
 }
 
 #popup-close {
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  font-size: 24px;
-  cursor: pointer;
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 24px;
+    cursor: pointer;
 }
 
 #popup-delete-btn {
-  margin-top: 10px;
-  background: #d63031;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
+    margin-top: 10px;
+    background: #d63031;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
+#popup-delete-btn2 {
+    margin-top: 10px;
+    background: #d63031;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
+
+/* new update 16-07-2025  */
+.upcoming-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.close-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: end;
+    font-size: 36px;
+    position: absolute;
+    top: 0;
+    right: 16px;
+}
+
+.close-wrap span {
+    cursor: pointer;
+}
+
+li {
+    cursor: pointer;
+}
+
+/* Add this to style.css or inside a <style> tag */
+
+#upcoming-popup .popup-content {
+    background: var(--popup-bg, #fff);
+    border-radius: 16px;
+    padding: 20px;
+    width: 300px;
+    max-width: 90%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-family: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: fadeIn 0.3s ease;
+}
+
+#upcoming-popup input,
+#upcoming-popup textarea {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+    background: #f9f9f9;
+}
+
+#upcoming-popup textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+#upcoming-popup button {
+    padding: 10px;
+    background: #00b894;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#upcoming-popup button:hover {
+    background: #019870;
+}
+
+#popup-close {
+    font-size: 20px;
+    color: #999;
+    cursor: pointer;
+    align-self: flex-end;
+}
+
+button.add-upcoming-btn {
+    background-color: #00b894;
+    color: #ffffff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 28px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 12px;
+}
+
+button.add-upcoming-btn:hover {
+    background-color: #009578;
+}
+
+.upcoming-btn {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.red{
+    color: red;
+}
+.green{
+    color: #019870;
+}
+
+.upcoming-controls {
+  text-align: right;
+  margin-top: 5px;
+}
+
+#toggle-upcoming-btn {
+  background: none;
+  border: none;
+  color: #3498db;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+#toggle-upcoming-btn:hover {
+  text-decoration: underline;
+}
+.entries-controls {
+  text-align: right;
+  margin-top: 10px;
+}
+
+#toggle-entries-btn {
+  background: none;
+  border: none;
+  color: #3498db;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+#toggle-entries-btn:hover {
+  text-decoration: underline;
+}
+
+/* loading for the upcoming expenses */
+.upcoming-list .entry-card {
+  position: relative;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 0 5px #ff7272;
+}
+
+.upcoming-list .progress-bar-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  z-index: 0;
+  transition: width 0.3s ease;
+  border-radius: 8px;
+}
+
+.upcoming-list .entry-info {
+  position: relative;
+  z-index: 1;
+}
 
 
 /* Dark Mode */
@@ -395,6 +589,9 @@ body.dark .entry-card.income {
 
 body.dark .entry-card.expense {
     background-color: #ff7272 !important;
+}
+body.dark .upcoming-list .entry-card.expense {
+    background-color: #ffe8e8 !important;
 }
 
 body.dark input,
@@ -446,12 +643,35 @@ body.dark .dropdown-list div:hover {
 
 /* Entry list popup */
 body.dark .popup-content {
-  background: #2e2e2e;
-  color: white;
+    background: #2e2e2e;
+    color: white;
 }
 
 body.dark #popup-delete-btn {
-  background: #ff5e57;
+    background: #ff5e57;
+}
+
+body.dark #popup-delete-btn2 {
+    background: #ff5e57;
+}
+
+
+/*  upcoming entries  */
+body.dark #upcoming-popup .popup-content {
+    background: #1e1e1e;
+    color: #eee;
+}
+
+body.dark #upcoming-popup input,
+body.dark #upcoming-popup textarea {
+    background: #2c2c2c;
+    color: #eee;
+    border-color: #444;
+    outline: none;
+}
+
+body.dark #popup-close {
+    color: #ccc;
 }
 
 /* Responsive */

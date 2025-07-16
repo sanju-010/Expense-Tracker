@@ -1,6 +1,8 @@
 let entries = JSON.parse(localStorage.getItem("entries")) || [];
 let categories = JSON.parse(localStorage.getItem("categories")) || [];
 let chart, barChart;
+let showAllUpcoming = false;
+let showAllEntries = false;
 
 // document.addEventListener("DOMContentLoaded", () => {
 //   document.getElementById("date").valueAsDate = new Date();
@@ -28,6 +30,7 @@ function initApp() {
   updateCategoryUI();
   updateUI();
   onFilterChange(); // Ensure dropdowns load correctly
+  updateUpcomingUI();
 
 }
 
@@ -165,12 +168,34 @@ function populateYearSelect() {
 
   const currentYear = new Date().getFullYear();
 
-  // Determine the earliest year from entries
-  const startYear = entries.length
-    ? new Date(Math.min(...entries.map(e => new Date(e.date).getTime()))).getFullYear()
-    : currentYear; // fallback if no entries
+  const allDates = [];
 
-  for (let y = currentYear; y >= startYear; y--) {
+  // Collect dates from entries
+  if (entries.length > 0) {
+    entries.forEach(e => {
+      const d = new Date(e.date);
+      if (!isNaN(d)) allDates.push(d.getFullYear());
+    });
+  }
+
+  // Collect dates from upcoming payments
+  if (upcomingPayments.length > 0) {
+    upcomingPayments.forEach(u => {
+      const d = new Date(u.dueDate);
+      if (!isNaN(d)) allDates.push(d.getFullYear());
+    });
+  }
+
+  // Fallback if there’s no data at all
+  if (allDates.length === 0) {
+    allDates.push(currentYear);
+  }
+
+  // Find min and max years
+  const startYear = Math.min(...allDates);
+  const endYear = Math.max(...allDates);
+
+  for (let y = endYear; y >= startYear; y--) {
     const opt = document.createElement("option");
     opt.value = y;
     opt.textContent = y;
@@ -179,38 +204,65 @@ function populateYearSelect() {
 }
 
 
+
 function populateMonthYearSelect() {
   const select = document.getElementById("month-year-select");
   select.innerHTML = "";
 
-  const currentDate = new Date();
-  const currentYear = currentDate.getFullYear();
-  const currentMonth = currentDate.getMonth();
+  const dates = [];
 
-  // Find the earliest entry date
-  let earliest = entries.length
-    ? new Date(Math.min(...entries.map(e => new Date(e.date).getTime())))
-    : new Date(currentDate.getFullYear(), 0); // fallback: Jan of current year
+  // Collect dates from entries
+  if (entries.length > 0) {
+    entries.forEach(e => {
+      const d = new Date(e.date);
+      if (!isNaN(d)) dates.push(d.getTime());
+    });
+  }
 
-  const startYear = earliest.getFullYear();
-  const startMonth = earliest.getMonth();
+  // Collect dates from upcoming payments
+  if (upcomingPayments.length > 0) {
+    upcomingPayments.forEach(u => {
+      const d = new Date(u.dueDate);
+      if (!isNaN(d)) dates.push(d.getTime());
+    });
+  }
+
+  // If there are no dates, default to the current date.
+  if (dates.length === 0) {
+    dates.push(new Date().getTime());
+  }
+
+  // Determine earliest and latest years from the collected dates
+  const earliestDate = new Date(Math.min(...dates));
+  const latestDate = new Date(Math.max(...dates));
+  const earliestYear = earliestDate.getFullYear();
+  const latestYear = latestDate.getFullYear();
 
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
 
-  for (let y = currentYear; y >= startYear; y--) {
-    const maxMonth = y === currentYear ? currentMonth : 11;
-    const minMonth = y === startYear ? startMonth : 0;
-    for (let m = maxMonth; m >= minMonth; m--) {
-      const opt = document.createElement("option");
-      opt.value = `${y}-${m}`;
-      opt.textContent = `${months[m]} ${y}`;
-      select.appendChild(opt);
+  // Loop from the latest year down to the earliest
+  for (let y = latestYear; y >= earliestYear; y--) {
+    // For each year, loop through all 12 months
+    for (let m = 11; m >= 0; m--) {
+      // Check if there's any date (entry or upcoming) in this month and year
+      const hasData = dates.some(ts => {
+        const d = new Date(ts);
+        return d.getFullYear() === y && d.getMonth() === m;
+      });
+      // Only add the month option if there's data
+      if (hasData) {
+        const opt = document.createElement("option");
+        opt.value = `${y}-${m}`;
+        opt.textContent = `${months[m]} ${y}`;
+        select.appendChild(opt);
+      }
     }
   }
 }
+
 
 
 
@@ -311,6 +363,7 @@ function updateUI() {
   const chartCanvas = document.getElementById("chart").parentElement;
   const barCanvas = document.getElementById("barChart").parentElement;
 
+
   const now = new Date();
 
   const filtered = entries.filter(e => {
@@ -346,15 +399,21 @@ function updateUI() {
   // Show/hide no data message and chart visibility
   const hasData = filtered.length > 0;
   noDataMsg.style.display = hasData ? "none" : "block";
-  document.getElementById("chart").style.display = hasData ? "block" : "none";
-  document.getElementById("barChart").style.display = hasData ? "block" : "none";
+  document.getElementById("chart").classList.toggle("hidden", !hasData);
+  document.getElementById("barChart").classList.toggle("hidden", !hasData);
+  // document.getElementById("barChart").style.display = hasData ? "block" : "none";
   document.getElementById("search-drp").style.display = hasData ? "block" : "none";
   document.getElementById("entry-list-title").style.display = hasData ? "block" : "none";
+  console.log("Chart display set to:", document.getElementById("chart").style.display);
 
   let income = 0, expense = 0;
   entryList.innerHTML = "";
 
-  filtered.forEach((e, i) => {
+  // 👉 Sort by latest date first
+  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  const visibleEntries = showAllEntries ? filtered : filtered.slice(0, 4);
+
+  visibleEntries.forEach((e, i) => {
     if (e.type === "income") income += e.amount;
     else expense += e.amount;
 
@@ -366,22 +425,98 @@ function updateUI() {
 
     li.onclick = () => showPopup(e, i);  // Add this
     li.innerHTML = `
-        <div class="entry-info">
-          <div class="entry-name">${e.name}</div>
-          <div class="entry-details">${dateStr} • ${e.category}</div>
-        </div>
-        <div class="entry-amount">${e.type === "income" ? "+" : "-"}₹${e.amount}</div>
-        `;
-        
-        // <button class="entry-delete" onclick="event.stopPropagation(); deleteEntry(${i})">🗑</button>
+          <div class="entry-info">
+            <div class="entry-name">${e.name}</div>
+            <div class="entry-details">${dateStr} • ${e.category}</div>
+          </div>
+          <div class="entry-amount">${e.type === "income" ? "+" : "-"}₹${e.amount}</div>
+          `;
+
+    // <button class="entry-delete" onclick="event.stopPropagation(); deleteEntry(${i})">🗑</button>
 
     entryList.appendChild(li);
   });
 
+  const toggleBtn = document.getElementById("toggle-entries-btn");
+  if (filtered.length > 4) {
+    toggleBtn.style.display = "block";
+    toggleBtn.textContent = showAllEntries ? "Show less" : "Show more";
+  } else {
+    toggleBtn.style.display = "none";
+  }
+
   incomeDisplay.textContent = income.toFixed(2);
-  expenseDisplay.textContent = expense.toFixed(2);
+  // expenseDisplay.textContent = expense.toFixed(2);
   balanceDisplay.textContent = (income - expense).toFixed(2);
 
+
+  // ********
+  // Upcoming total
+  // Check if any filter is active
+  const isFilterActive = (
+    filter !== "" &&
+    filter !== "all" &&
+    !(filter === "by-year" && yearSelect.value === "") &&
+    !(filter === "by-month-year" && monthYearSelect.value === "")
+  );
+
+  // Upcoming total logic
+  // const filter = document.getElementById("filter").value;
+  const upcoming = JSON.parse(localStorage.getItem("upcoming")) || [];
+  let upcomingTotal = 0;
+
+  // const now = new Date();
+
+  upcomingTotal = upcoming.reduce((sum, u) => {
+    const due = new Date(u.dueDate);
+    if (isNaN(due)) return sum;
+
+    const yearDiff = now.getFullYear() - due.getFullYear();
+    const monthDiff = yearDiff * 12 + (now.getMonth() - due.getMonth());
+
+    let include = false;
+
+    if (filter === "this-month") {
+      include = monthDiff === 0;
+    } else if (filter === "last-3-months") {
+      include = monthDiff >= 0 && monthDiff <= 2;
+    } else if (filter === "last-6-months") {
+      include = monthDiff >= 0 && monthDiff <= 5;
+    } else if (filter === "last-12-months") {
+      include = monthDiff >= 0 && monthDiff <= 11;
+    } else if (filter === "by-year") {
+      const selectedYear = parseInt(document.getElementById("year-select").value);
+      include = due.getFullYear() === selectedYear;
+    } else if (filter === "by-month-year") {
+      const [selectedYear, selectedMonth] = document.getElementById("month-year-select").value.split("-").map(Number);
+      include = due.getFullYear() === selectedYear && due.getMonth() === selectedMonth;
+    } else {
+      // No filter → include all
+      include = true;
+    }
+
+    return include ? sum + Number(u.amount) : sum;
+  }, 0);
+
+
+  console.log("💰 Income:", income);
+  console.log("💸 Actual Expense:", expense);
+  console.log("📅 Upcoming Payments Total:", upcomingTotal);
+
+  const finalExpense = expense + upcomingTotal;
+  const finalBalance = income - finalExpense;
+
+  console.log("🧾 Final Expense (with upcoming):", finalExpense);
+  console.log("🟢 Final Balance:", finalBalance);
+
+  // Update UI
+  incomeDisplay.textContent = income.toFixed(2);
+  // expenseDisplay.innerHTML = `${expense.toFixed(2)} (<span class="red">₹${upcomingTotal.toFixed(2)}</span> upcoming)`;
+  expenseDisplay.innerHTML = `<span class="red">₹${expense.toFixed(2)}</span> (<span class="red">₹${upcomingTotal.toFixed(2)}</span> upcoming)`;
+
+  balanceDisplay.textContent = finalBalance.toFixed(2);
+
+  // **********
   if (hasData) {
     updatePieChart(income, expense);
     updateBarChart(filtered);
@@ -389,7 +524,7 @@ function updateUI() {
     if (chart) chart.destroy();
     if (barChart) barChart.destroy();
   }
-}1013242
+} 1013242
 
 function showPopup(entry, index) {
   document.getElementById('popup-name').textContent = entry.name;
@@ -415,9 +550,6 @@ function showPopup(entry, index) {
 function closePopup(event) {
   document.getElementById('entry-popup').style.display = 'none';
 }
-
-
-
 
 function updatePieChart(income, expense) {
   const ctx = document.getElementById("chart").getContext("2d");
@@ -529,4 +661,182 @@ function applyTheme() {
 }
 function toggleMenu() {
   document.body.classList.toggle("menu-open");
+}
+function toggleentries() {
+  showAllEntries = !showAllEntries;
+  updateUI();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+let upcomingPayments = JSON.parse(localStorage.getItem("upcoming")) || [];
+
+function addUpcoming(name, amount, dueDate, description) {
+  upcomingPayments.push({ name, amount, dueDate, description });
+  localStorage.setItem("upcoming", JSON.stringify(upcomingPayments));
+  updateUpcomingUI();
+}
+
+
+function updateUpcomingUI() {
+  const list = document.getElementById("upcoming-list");
+  const toggleBtn = document.getElementById("toggle-upcoming-btn");
+
+  list.innerHTML = "";
+
+  if (!upcomingPayments.length) {
+    list.innerHTML = "<li style='color: #777;'>No upcoming payments.</li>";
+    toggleBtn.style.display = "none"; // hide toggle if nothing
+
+    return;
+  }
+
+  const today = new Date();
+
+  // Sort upcoming payments by due date (soonest first)
+  upcomingPayments.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+  const visibleItems = showAllUpcoming ? upcomingPayments : upcomingPayments.slice(0, 2);
+
+  visibleItems.forEach((item, index) => {
+    const due = new Date(item.dueDate);
+    const daysLeft = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+
+    const totalSpan = 100; // Maximum days for full green → red shift
+    const daysPassed = Math.max(totalSpan - daysLeft, 0);
+    const percent = Math.min((daysPassed / totalSpan) * 100, 100);
+
+    // Color from green → yellow → red (based on percent)
+    let color = "green";
+    if (percent > 75) color = "#ff7272";
+    else if (percent > 50) color = "orange";
+    else if (percent > 25) color = "yellow";
+
+
+    const li = document.createElement("li");
+    li.innerHTML = `
+    <div class="entry-card expense">
+      <div class="progress-bar-bg" style="width: ${percent}%; background-color: ${color};"></div>
+      <div class="entry-info">
+        <div class="entry-name">${item.name}</div>
+        <div class="entry-details">₹${item.amount} • Due in ${daysLeft} days (${item.dueDate})</div>
+      </div>
+    </div>
+  `;
+
+    // Add click handler to open popup with correct item/index
+    li.querySelector(".entry-card").addEventListener("click", () => {
+      showUpcomingPopup(item, index);
+    });
+    list.appendChild(li);
+  });
+  // Show or hide toggle button
+  if (upcomingPayments.length > 2) {
+    toggleBtn.style.display = "block";
+    toggleBtn.textContent = showAllUpcoming ? "Show less" : "Show more";
+  } else {
+    toggleBtn.style.display = "none";
+  }
+}
+
+
+function deleteUpcoming(index) {
+  console.log("clicked");
+  if (confirm("Delete this upcoming payment?")) {
+    console.log("clicked con");
+    upcomingPayments.splice(index, 1);
+    localStorage.setItem("upcoming", JSON.stringify(upcomingPayments));
+    updateUpcomingUI();
+  }
+}
+function openUpcomingForm() {
+  document.getElementById("upcoming-popup").style.display = "flex";
+  // 🗓 Set default date to today if not selected
+  const dateInput = document.getElementById("up-date");
+  if (!dateInput.value) {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    dateInput.value = `${yyyy}-${mm}-${dd}`;
+  }
+}
+
+function closeUpcomingPopup(e) {
+  document.getElementById("upcoming-popup").style.display = "none";
+}
+
+function submitUpcoming() {
+  const name = document.getElementById("up-name").value.trim();
+  const amount = parseFloat(document.getElementById("up-amount").value);
+  const date = document.getElementById("up-date").value;
+  const description = document.getElementById("up-description").value.trim();
+
+  // ✅ If date not selected, fallback to today
+  if (!date) {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    date = `${yyyy}-${mm}-${dd}`;
+  }
+
+  if (!name || isNaN(amount) || !date) {
+    alert("Please fill all fields correctly.");
+    return;
+  }
+
+  addUpcoming(name, amount, date, description);
+  closeUpcomingPopup();
+  document.getElementById("up-name").value = '';
+  document.getElementById("up-amount").value = '';
+  document.getElementById("up-date").value = '';
+  document.getElementById("up-description").value = '';
+}
+function showUpcomingPopup(item, index) {
+  document.getElementById("up-popup-name").textContent = item.name;
+  document.getElementById("up-popup-amount").textContent = `₹${item.amount}`;
+  document.getElementById("up-popup-date").textContent = item.dueDate;
+  document.getElementById("up-popup-description").textContent = item.description || "No description";
+
+  // Setup delete button to delete this entry
+  // const deleteBtn = document.getElementById("upcoming-delete-btn");
+  // deleteBtn.onclick = () => {
+  //   if (confirm("Delete this upcoming payment?")) {
+  //     deleteUpcoming(index);  // ✅ This now works
+  //     closeUpcomingViewPopup();
+  //   }
+  // };
+  const deleteBtn = document.getElementById('popup-delete-btn2');
+  deleteBtn.onclick = () => {
+    console.log("clsssicked");
+    deleteUpcoming(index);
+    closeUpcomingViewPopup();
+  };
+
+  document.getElementById("upcoming-popup-view").style.display = "flex";
+}
+
+function closeUpcomingViewPopup(event) {
+  document.getElementById("upcoming-popup-view").style.display = "none";
+}
+
+
+function toggleUpcoming() {
+  showAllUpcoming = !showAllUpcoming;
+  updateUpcomingUI();
 }
